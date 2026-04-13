@@ -105,7 +105,7 @@ function SidebarContent({
           </p>
           <button
             onClick={() => { setCategoryFilter("Saved"); onSelect(); }}
-            className={`w-full flex items-center justify-between px-2 py-2 rounded-md text-[0.85rem] text-left transition-colors duration-100 ${
+            className={`w-full flex items-center justify-between px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
               categoryFilter === "Saved"
                 ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
                 : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
@@ -131,7 +131,7 @@ function SidebarContent({
               <button
                 key={cat}
                 onClick={() => { setCategoryFilter(cat); onSelect(); }}
-                className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.85rem] text-left transition-colors duration-100 ${
+                className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
                   categoryFilter === cat
                     ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
                     : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
@@ -153,8 +153,8 @@ function SidebarContent({
             {sources.map((src) => (
               <button
                 key={src}
-                onClick={() => { setSearch(src); onSelect(); }}
-                className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.85rem] text-left text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa] transition-colors duration-100"
+                onClick={() => { setCategoryFilter("All"); setSearch(src); onSelect(); }}
+                className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa] transition-colors duration-100"
               >
                 <Globe size={15} strokeWidth={1.5} className="flex-shrink-0" />
                 <span className="truncate">{src}</span>
@@ -456,7 +456,7 @@ export default function Home() {
                           </>
                         )}
                       </p>
-                      <p className="text-[1rem] font-medium leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
+                      <p className="font-display text-[1.05rem] font-normal leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
                         {item.title}
                       </p>
                       {item.summary && (
@@ -555,7 +555,7 @@ export default function Home() {
 
             {/* Reader content */}
             <div className="flex-1 overflow-y-auto px-5 md:px-10 py-8 md:py-10">
-              <h1 className="text-xl md:text-2xl font-semibold leading-tight text-[#1a1a1a] dark:text-[#e2e2de] mb-6 md:mb-8">
+              <h1 className="font-display text-2xl md:text-3xl font-normal leading-tight text-[#1a1a1a] dark:text-[#e2e2de] mb-6 md:mb-8">
                 {selected.title}
               </h1>
 
