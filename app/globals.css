@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,165 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Article reader prose styles */
+.prose-reader {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: #3a3a38;
+}
+.dark .prose-reader {
+  color: #9a9a96;
+}
+
+/* Paragraphs — generous spacing so text breathes */
+.prose-reader p {
+  margin-bottom: 1.4rem;
+}
+
+/* Strip inline margin/padding often baked into RSS HTML */
+.prose-reader p:first-child {
+  margin-top: 0;
+}
+
+.prose-reader h1,
+.prose-reader h2,
+.prose-reader h3,
+.prose-reader h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  color: #1a1a1a;
+}
+.dark .prose-reader h1,
+.dark .prose-reader h2,
+.dark .prose-reader h3,
+.dark .prose-reader h4 {
+  color: #e2e2de;
+}
+
+.prose-reader a {
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #ccc;
+}
+.prose-reader a:hover {
+  color: #1a1a1a;
+  text-decoration-color: #888;
+}
+.dark .prose-reader a {
+  color: #777;
+  text-decoration-color: #333;
+}
+.dark .prose-reader a:hover {
+  color: #e2e2de;
+}
+
+.prose-reader blockquote {
+  border-left: 3px solid #e0e0dc;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  color: #888;
+  margin: 1.5rem 0;
+  font-style: italic;
+}
+.dark .prose-reader blockquote {
+  border-left-color: #2a2a28;
+  color: #666;
+}
+
+.prose-reader pre {
+  background: #f4f4f2;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1.5rem 0;
+}
+.dark .prose-reader pre {
+  background: #1a1a18;
+}
+
+.prose-reader code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  background: #f0f0ec;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+.dark .prose-reader code {
+  background: #222220;
+}
+
+/* Don't double-style code inside pre */
+.prose-reader pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose-reader img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  display: block;
+}
+
+.prose-reader ul,
+.prose-reader ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.4rem;
+}
+.prose-reader li {
+  margin-bottom: 0.4rem;
+  line-height: 1.7;
+}
+.prose-reader li > p {
+  margin-bottom: 0.4rem;
+}
+
+.prose-reader hr {
+  border: none;
+  border-top: 1px solid #e8e8e4;
+  margin: 2rem 0;
+}
+.dark .prose-reader hr {
+  border-top-color: #222220;
+}
+
+/* Tables */
+.prose-reader table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 1.4rem;
+}
+.prose-reader th,
+.prose-reader td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e8e8e4;
+}
+.dark .prose-reader th,
+.dark .prose-reader td {
+  border-bottom-color: #222220;
+}
+.prose-reader th {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.dark .prose-reader th {
+  color: #e2e2de;
+}
+
+/* Fix RSS HTML that dumps everything in one div with no spacing */
+.prose-reader div + div,
+.prose-reader br + br {
+  display: block;
+  margin-top: 1rem;
 }

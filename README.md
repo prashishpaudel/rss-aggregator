@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RSS Aggregator
+
+Personal RSS news dashboard built with Next.js. Aggregates posts from multiple sources, organizes by category, and lets you read articles inline.
+
+## Features
+
+- Fetches multiple RSS feeds in parallel
+- Category and language filters
+- Inline article reader (full content when feed provides it)
+- 10-minute server-side cache
+- Dark mode
+- Mobile responsive (slide-over drawer + full-screen reader)
+
+## Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- `rss-parser`
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Adding RSS Sources
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `lib/sources.ts`:
 
-## Learn More
+```ts
+{
+  name: "My Source",
+  url: "https://example.com/feed.xml",
+  category: "Tech",   // Tech | Politics | Ideas | Science | Other
+  language: "EN",     // EN | CN
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Current Sources
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Source | Category | Language |
+|--------|----------|----------|
+| LessWrong Frontpage | Ideas | EN |
+| LessWrong Curated | Ideas | EN |
+| Hacker News | Tech | EN |
+| Paul Graham Essays | Ideas | EN |
+| The Verge | Tech | EN |
+| MIT Technology Review | Science | EN |
+| Juejin | Tech | CN |
+| Escalation Trap | Politics | EN |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+Deploy to Vercel with zero config:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx vercel
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No environment variables required. Works on free plan.
+
+## Project Structure
+
+```
+app/
+  api/feed/route.ts   # API route — fetches, parses, caches feeds
+  page.tsx            # Main UI
+  globals.css         # Prose styles for article reader
+lib/
+  sources.ts          # RSS source definitions
+  rss.ts              # Fetch + parse logic
+```
