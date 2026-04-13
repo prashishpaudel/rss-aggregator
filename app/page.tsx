@@ -19,11 +19,32 @@ import {
   Layers,
   Menu,
   ArrowLeft,
+  Bookmark,
 } from "lucide-react";
 import type { FeedItem } from "@/lib/rss";
 
-type CategoryFilter = "All" | string;
+type CategoryFilter = "All" | "Saved" | string;
 type LanguageFilter = "All" | "EN" | "CN";
+
+const FAVS_KEY = "rss-favorites";
+
+function favKey(item: FeedItem) {
+  return item.link || item.title;
+}
+
+function loadFavs(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(FAVS_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFavs(favs: Set<string>) {
+  localStorage.setItem(FAVS_KEY, JSON.stringify(Array.from(favs)));
+}
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
@@ -43,11 +64,11 @@ function CategoryIcon({ category, size = 16 }: { category: string; size?: number
     case "Politics": return <BarChart2 {...props} />;
     case "Science":  return <FlaskConical {...props} />;
     case "All":      return <Layers {...props} />;
+    case "Saved":    return <Bookmark {...props} />;
     default:         return <BookOpen {...props} />;
   }
 }
 
-// Sidebar content — shared between desktop rail and mobile drawer
 function SidebarContent({
   categories,
   sources,
@@ -58,6 +79,7 @@ function SidebarContent({
   setDarkMode,
   loading,
   fetchFeed,
+  favCount,
   onSelect,
 }: {
   categories: string[];
@@ -69,11 +91,36 @@ function SidebarContent({
   setDarkMode: (fn: (d: boolean) => boolean) => void;
   loading: boolean;
   fetchFeed: () => void;
-  onSelect: () => void; // close drawer on mobile after picking
+  favCount: number;
+  onSelect: () => void;
 }) {
   return (
     <>
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+
+        {/* Saved */}
+        <div>
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-2 px-1">
+            Library
+          </p>
+          <button
+            onClick={() => { setCategoryFilter("Saved"); onSelect(); }}
+            className={`w-full flex items-center justify-between px-2 py-2 rounded-md text-[0.85rem] text-left transition-colors duration-100 ${
+              categoryFilter === "Saved"
+                ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
+                : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <Bookmark size={15} strokeWidth={1.5} />
+              Saved
+            </span>
+            {favCount > 0 && (
+              <span className="text-[10px] tabular-nums text-[#bbb] dark:text-[#444]">{favCount}</span>
+            )}
+          </button>
+        </div>
+
         {/* Categories */}
         <div>
           <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-2 px-1">
@@ -149,10 +196,24 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [selected, setSelected] = useState<FeedItem | null>(null);
-  // Desktop: collapsible rail. Mobile: ignored (use drawerOpen instead)
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  // Mobile-only drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [favs, setFavs] = useState<Set<string>>(new Set());
+
+  // Load favorites from localStorage on mount
+  useEffect(() => { setFavs(loadFavs()); }, []);
+
+  const toggleFav = useCallback((item: FeedItem, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setFavs((prev) => {
+      const next = new Set(prev);
+      const key = favKey(item);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      saveFavs(next);
+      return next;
+    });
+  }, []);
 
   const fetchFeed = useCallback(async () => {
     setLoading(true);
@@ -184,6 +245,7 @@ export default function Home() {
   const sources = Array.from(new Set(items.map((i) => i.source))).sort();
 
   const filtered = items.filter((item) => {
+    if (categoryFilter === "Saved") return favs.has(favKey(item));
     if (categoryFilter !== "All" && item.category !== categoryFilter) return false;
     if (langFilter !== "All" && item.language !== langFilter) return false;
     if (search) {
@@ -207,6 +269,7 @@ export default function Home() {
     setDarkMode,
     loading,
     fetchFeed,
+    favCount: favs.size,
   };
 
   return (
@@ -238,12 +301,10 @@ export default function Home() {
         {/* ── Mobile drawer overlay ── */}
         {drawerOpen && (
           <div className="md:hidden fixed inset-0 z-50 flex">
-            {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/30 dark:bg-black/50"
               onClick={() => setDrawerOpen(false)}
             />
-            {/* Drawer panel */}
             <aside className="relative flex flex-col w-72 max-w-[85vw] h-full bg-[#f0f0ec] dark:bg-[#141413] border-r border-[#e8e8e4] dark:border-[#222220] shadow-xl">
               <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
                 <div className="flex items-center gap-2 text-[#888] dark:text-[#555]">
@@ -268,7 +329,6 @@ export default function Home() {
             sidebarOpen ? "w-52" : "w-12"
           }`}
         >
-          {/* Desktop sidebar header */}
           <div className="flex items-center justify-between px-3 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
             {sidebarOpen && (
               <div className="flex items-center gap-2 text-[#888] dark:text-[#555]">
@@ -288,11 +348,8 @@ export default function Home() {
             </button>
           </div>
 
-          {sidebarOpen && (
-            <SidebarContent {...sidebarProps} onSelect={() => {}} />
-          )}
+          {sidebarOpen && <SidebarContent {...sidebarProps} onSelect={() => {}} />}
 
-          {/* Collapsed sidebar footer */}
           {!sidebarOpen && (
             <div className="mt-auto border-t border-[#e8e8e4] dark:border-[#222220] p-3 flex flex-col items-center gap-3">
               <button
@@ -318,7 +375,6 @@ export default function Home() {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Toolbar */}
           <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
-            {/* Language pills */}
             <div className="flex gap-1">
               {(["All", "EN", "CN"] as LanguageFilter[]).map((lang) => (
                 <button
@@ -335,7 +391,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Search */}
             <div className="ml-auto flex items-center gap-2 text-[#aaa] dark:text-[#444] border-b border-[#ddd] dark:border-[#2a2a28] pb-0.5">
               <Search size={14} strokeWidth={1.5} />
               <input
@@ -366,43 +421,70 @@ export default function Home() {
               <p className="px-5 py-20 text-sm text-[#bbb] dark:text-[#444] text-center">Loading…</p>
             )}
             {!loading && filtered.length === 0 && (
-              <p className="px-5 py-20 text-sm text-[#bbb] dark:text-[#444] text-center">Nothing here.</p>
+              <p className="px-5 py-20 text-sm text-[#bbb] dark:text-[#444] text-center">
+                {categoryFilter === "Saved" ? "No saved articles yet." : "Nothing here."}
+              </p>
             )}
 
             <div className="divide-y divide-[#ebebea] dark:divide-[#1c1c1b]">
-              {filtered.map((item, idx) => (
-                <button
-                  key={`${item.link}-${idx}`}
-                  onClick={() => setSelected(item)}
-                  className={`w-full text-left px-4 md:px-5 py-4 hover:bg-[#f0f0ec] dark:hover:bg-[#141413] transition-colors duration-100 group ${
-                    selected?.link === item.link && selected?.title === item.title
-                      ? "bg-[#ebebea] dark:bg-[#1a1a18]"
-                      : ""
-                  }`}
-                >
-                  <p className="text-xs text-[#aaa] dark:text-[#444] mb-1.5 flex items-center gap-1.5 flex-wrap">
-                    <span>{item.source}</span>
-                    <span>·</span>
-                    <span>{item.category}</span>
-                    <span>·</span>
-                    <span>{formatDate(item.date)}</span>
-                    {item.fullContent && (
-                      <>
+              {filtered.map((item, idx) => {
+                const isFav = favs.has(favKey(item));
+                return (
+                  <div
+                    key={`${item.link}-${idx}`}
+                    className={`relative group flex items-start gap-2 px-4 md:px-5 py-4 hover:bg-[#f0f0ec] dark:hover:bg-[#141413] transition-colors duration-100 ${
+                      selected?.link === item.link && selected?.title === item.title
+                        ? "bg-[#ebebea] dark:bg-[#1a1a18]"
+                        : ""
+                    }`}
+                  >
+                    {/* Main clickable area */}
+                    <button
+                      className="flex-1 text-left min-w-0"
+                      onClick={() => setSelected(item)}
+                    >
+                      <p className="text-xs text-[#aaa] dark:text-[#444] mb-1.5 flex items-center gap-1.5 flex-wrap">
+                        <span>{item.source}</span>
                         <span>·</span>
-                        <BookOpen size={11} strokeWidth={1.5} className="text-[#bbb] dark:text-[#3a3a38]" />
-                      </>
-                    )}
-                  </p>
-                  <p className="text-[1rem] font-medium leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
-                    {item.title}
-                  </p>
-                  {item.summary && (
-                    <p className="mt-1.5 text-[0.82rem] text-[#999] dark:text-[#4a4a48] leading-relaxed line-clamp-2">
-                      {item.summary}
-                    </p>
-                  )}
-                </button>
-              ))}
+                        <span>{item.category}</span>
+                        <span>·</span>
+                        <span>{formatDate(item.date)}</span>
+                        {item.fullContent && (
+                          <>
+                            <span>·</span>
+                            <BookOpen size={11} strokeWidth={1.5} className="text-[#bbb] dark:text-[#3a3a38]" />
+                          </>
+                        )}
+                      </p>
+                      <p className="text-[1rem] font-medium leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
+                        {item.title}
+                      </p>
+                      {item.summary && (
+                        <p className="mt-1.5 text-[0.82rem] text-[#999] dark:text-[#4a4a48] leading-relaxed line-clamp-2">
+                          {item.summary}
+                        </p>
+                      )}
+                    </button>
+
+                    {/* Bookmark button */}
+                    <button
+                      onClick={(e) => toggleFav(item, e)}
+                      className={`flex-shrink-0 mt-0.5 p-1 rounded transition-colors duration-100 ${
+                        isFav
+                          ? "text-[#888] dark:text-[#666]"
+                          : "text-transparent group-hover:text-[#ccc] dark:group-hover:text-[#333]"
+                      } hover:text-[#555] dark:hover:text-[#aaa]`}
+                      aria-label={isFav ? "Remove from saved" : "Save article"}
+                    >
+                      <Bookmark
+                        size={14}
+                        strokeWidth={1.5}
+                        fill={isFav ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {filtered.length > 0 && (
@@ -425,7 +507,6 @@ export default function Home() {
           ">
             {/* Reader header */}
             <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 border-b border-[#e8e8e4] dark:border-[#222220]">
-              {/* Mobile: back arrow. Desktop: meta text */}
               <button
                 onClick={() => setSelected(null)}
                 className="md:hidden text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors mr-3"
@@ -437,6 +518,22 @@ export default function Home() {
                 {selected.source} · {selected.category} · {formatDate(selected.date)}
               </p>
               <div className="flex items-center gap-3 flex-shrink-0">
+                {/* Bookmark in reader */}
+                <button
+                  onClick={(e) => toggleFav(selected, e)}
+                  className={`transition-colors duration-100 ${
+                    favs.has(favKey(selected))
+                      ? "text-[#888] dark:text-[#666]"
+                      : "text-[#ccc] dark:text-[#333] hover:text-[#555] dark:hover:text-[#aaa]"
+                  }`}
+                  aria-label={favs.has(favKey(selected)) ? "Remove from saved" : "Save article"}
+                >
+                  <Bookmark
+                    size={15}
+                    strokeWidth={1.5}
+                    fill={favs.has(favKey(selected)) ? "currentColor" : "none"}
+                  />
+                </button>
                 <a
                   href={selected.link}
                   target="_blank"
