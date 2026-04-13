@@ -29,24 +29,6 @@ export const sources: RSSSource[] = [
     language: "EN",
   },
   {
-    name: "Paul Graham Essays",
-    url: "https://www.aaronsw.com/2002/feeds/pgessays.rss",
-    category: "Ideas",
-    language: "EN",
-  },
-  {
-    name: "The Verge",
-    url: "https://www.theverge.com/rss/index.xml",
-    category: "Tech",
-    language: "EN",
-  },
-  {
-    name: "MIT Technology Review",
-    url: "https://www.technologyreview.com/feed/",
-    category: "Science",
-    language: "EN",
-  },
-  {
     name: "Juejin",
     url: "https://juejin.cn/rss",
     category: "Tech",
