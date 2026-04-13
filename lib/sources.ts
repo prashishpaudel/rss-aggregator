@@ -33,4 +33,14 @@ export const sources: RSSSource[] = [
     url: "https://escalationtrap.substack.com/feed",
     category: "Politics",
   },
+  {
+    name: "ByteByteGo",
+    url: "https://blog.bytebytego.com/feed",
+    category: "Tech",
+  },
+  {
+    name: "Latent Space",
+    url: "https://www.latent.space/feed",
+    category: "Tech",
+  },
 ];

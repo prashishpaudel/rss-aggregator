@@ -6,6 +6,7 @@ export interface FeedItem {
   link: string;
   date: string;
   source: string;
+  sourceDomain: string;
   category: string;
   summary: string;
   // Full HTML content from feed (not all feeds provide this)
@@ -69,6 +70,7 @@ async function fetchFeed(source: RSSSource): Promise<FeedItem[]> {
         link: item.link || item.guid || "",
         date: item.pubDate || item.isoDate || new Date().toISOString(),
         source: source.name,
+        sourceDomain: new URL(source.url).hostname.replace("www.", ""),
         category: source.category,
         summary: stripHtml(
           item.contentSnippet || item.content || item.summary || ""

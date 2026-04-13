@@ -22,6 +22,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import type { FeedItem } from "@/lib/rss";
+import { sources as allSources } from "@/lib/sources";
 
 type CategoryFilter = "All" | "Saved" | string;
 
@@ -66,6 +67,31 @@ function CategoryIcon({ category, size = 16 }: { category: string; size?: number
     case "Saved":    return <Bookmark {...props} />;
     default:         return <BookOpen {...props} />;
   }
+}
+
+// Map source name → domain for favicon lookup
+const sourceDomainMap: Record<string, string> = Object.fromEntries(
+  allSources.map((s) => [s.name, new URL(s.url).hostname.replace("www.", "")])
+);
+
+function faviconUrl(domain: string) {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+}
+
+function SourceFavicon({ domain, size = 16 }: { domain: string; size?: number }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <Globe size={size} strokeWidth={1.5} className="flex-shrink-0" />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={faviconUrl(domain)}
+      alt=""
+      width={size}
+      height={size}
+      className="flex-shrink-0 rounded-sm"
+      onError={() => setFailed(true)}
+    />
+  );
 }
 
 function SidebarContent({
@@ -155,7 +181,7 @@ function SidebarContent({
                 onClick={() => { setCategoryFilter("All"); setSearch(src); onSelect(); }}
                 className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa] transition-colors duration-100"
               >
-                <Globe size={17} strokeWidth={1.5} className="flex-shrink-0" />
+                <SourceFavicon domain={sourceDomainMap[src] ?? src} size={17} />
                 <span className="truncate">{src}</span>
               </button>
             ))}
@@ -426,6 +452,7 @@ export default function Home() {
                       onClick={() => setSelected(item)}
                     >
                       <p className="text-xs text-[#aaa] dark:text-[#444] mb-1.5 flex items-center gap-1.5 flex-wrap">
+                        <SourceFavicon domain={item.sourceDomain} size={13} />
                         <span>{item.source}</span>
                         <span>·</span>
                         <span>{formatDate(item.date)}</span>
@@ -494,7 +521,8 @@ export default function Home() {
               >
                 <ArrowLeft size={22} strokeWidth={1.5} />
               </button>
-              <p className="text-xs text-[#aaa] dark:text-[#444] truncate flex-1 mr-3">
+              <p className="text-xs text-[#aaa] dark:text-[#444] truncate flex-1 mr-3 flex items-center gap-1.5">
+                <SourceFavicon domain={selected.sourceDomain} size={13} />
                 {selected.source} · {formatDate(selected.date)}
               </p>
               <div className="flex items-center gap-3 flex-shrink-0">
