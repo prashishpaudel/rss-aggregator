@@ -24,7 +24,6 @@ import {
 import type { FeedItem } from "@/lib/rss";
 
 type CategoryFilter = "All" | "Saved" | string;
-type LanguageFilter = "All" | "EN" | "CN";
 
 const FAVS_KEY = "rss-favorites";
 
@@ -112,7 +111,7 @@ function SidebarContent({
             }`}
           >
             <span className="flex items-center gap-2.5">
-              <Bookmark size={15} strokeWidth={1.5} />
+              <Bookmark size={17} strokeWidth={1.5} />
               Saved
             </span>
             {favCount > 0 && (
@@ -137,7 +136,7 @@ function SidebarContent({
                     : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
                 }`}
               >
-                <CategoryIcon category={cat} size={15} />
+                <CategoryIcon category={cat} size={17} />
                 <span>{cat}</span>
               </button>
             ))}
@@ -156,7 +155,7 @@ function SidebarContent({
                 onClick={() => { setCategoryFilter("All"); setSearch(src); onSelect(); }}
                 className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa] transition-colors duration-100"
               >
-                <Globe size={15} strokeWidth={1.5} className="flex-shrink-0" />
+                <Globe size={17} strokeWidth={1.5} className="flex-shrink-0" />
                 <span className="truncate">{src}</span>
               </button>
             ))}
@@ -192,7 +191,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
-  const [langFilter, setLangFilter] = useState<LanguageFilter>("All");
+
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [selected, setSelected] = useState<FeedItem | null>(null);
@@ -247,7 +246,6 @@ export default function Home() {
   const filtered = items.filter((item) => {
     if (categoryFilter === "Saved") return favs.has(favKey(item));
     if (categoryFilter !== "All" && item.category !== categoryFilter) return false;
-    if (langFilter !== "All" && item.language !== langFilter) return false;
     if (search) {
       const q = search.toLowerCase();
       return (
@@ -283,10 +281,10 @@ export default function Home() {
             className="text-[#888] dark:text-[#555] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
             aria-label="Open menu"
           >
-            <Menu size={20} strokeWidth={1.5} />
+            <Menu size={24} strokeWidth={1.5} />
           </button>
           <div className="flex items-center gap-2 text-[#888] dark:text-[#555]">
-            <Rss size={16} strokeWidth={1.5} />
+            <Rss size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium tracking-widest uppercase">Feed</span>
           </div>
           <button
@@ -308,7 +306,7 @@ export default function Home() {
             <aside className="relative flex flex-col w-72 max-w-[85vw] h-full bg-[#f0f0ec] dark:bg-[#141413] border-r border-[#e8e8e4] dark:border-[#222220] shadow-xl">
               <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
                 <div className="flex items-center gap-2 text-[#888] dark:text-[#555]">
-                  <Rss size={16} strokeWidth={1.5} />
+                  <Rss size={18} strokeWidth={1.5} />
                   <span className="text-sm font-medium tracking-widest uppercase">Feed</span>
                 </div>
                 <button
@@ -332,7 +330,7 @@ export default function Home() {
           <div className="flex items-center justify-between px-3 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
             {sidebarOpen && (
               <div className="flex items-center gap-2 text-[#888] dark:text-[#555]">
-                <Rss size={16} strokeWidth={1.5} />
+                <Rss size={18} strokeWidth={1.5} />
                 <span className="text-sm font-medium tracking-widest uppercase">Feed</span>
               </div>
             )}
@@ -341,7 +339,7 @@ export default function Home() {
               className="text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors ml-auto"
             >
               <ChevronRight
-                size={16}
+                size={18}
                 strokeWidth={1.5}
                 className={`transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`}
               />
@@ -375,22 +373,6 @@ export default function Home() {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Toolbar */}
           <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
-            <div className="flex gap-1">
-              {(["All", "EN", "CN"] as LanguageFilter[]).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLangFilter(lang)}
-                  className={`text-[11px] tracking-widest uppercase px-2.5 py-1 rounded transition-colors duration-100 ${
-                    langFilter === lang
-                      ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
-                      : "text-[#bbb] dark:text-[#444] hover:text-[#666] dark:hover:text-[#888]"
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-
             <div className="ml-auto flex items-center gap-2 text-[#aaa] dark:text-[#444] border-b border-[#ddd] dark:border-[#2a2a28] pb-0.5">
               <Search size={14} strokeWidth={1.5} />
               <input
@@ -445,8 +427,6 @@ export default function Home() {
                     >
                       <p className="text-xs text-[#aaa] dark:text-[#444] mb-1.5 flex items-center gap-1.5 flex-wrap">
                         <span>{item.source}</span>
-                        <span>·</span>
-                        <span>{item.category}</span>
                         <span>·</span>
                         <span>{formatDate(item.date)}</span>
                         {item.fullContent && (
@@ -512,10 +492,10 @@ export default function Home() {
                 className="md:hidden text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors mr-3"
                 aria-label="Back to feed"
               >
-                <ArrowLeft size={18} strokeWidth={1.5} />
+                <ArrowLeft size={22} strokeWidth={1.5} />
               </button>
-              <p className="text-[11px] text-[#aaa] dark:text-[#444] truncate flex-1 mr-3">
-                {selected.source} · {selected.category} · {formatDate(selected.date)}
+              <p className="text-xs text-[#aaa] dark:text-[#444] truncate flex-1 mr-3">
+                {selected.source} · {formatDate(selected.date)}
               </p>
               <div className="flex items-center gap-3 flex-shrink-0">
                 {/* Bookmark in reader */}
@@ -529,7 +509,7 @@ export default function Home() {
                   aria-label={favs.has(favKey(selected)) ? "Remove from saved" : "Save article"}
                 >
                   <Bookmark
-                    size={15}
+                    size={18}
                     strokeWidth={1.5}
                     fill={favs.has(favKey(selected)) ? "currentColor" : "none"}
                   />
@@ -541,14 +521,14 @@ export default function Home() {
                   className="text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
                   title="Open original"
                 >
-                  <ExternalLink size={15} strokeWidth={1.5} />
+                  <ExternalLink size={18} strokeWidth={1.5} />
                 </a>
                 <button
                   onClick={() => setSelected(null)}
                   className="hidden md:block text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
                   aria-label="Close reader"
                 >
-                  <X size={15} strokeWidth={1.5} />
+                  <X size={18} strokeWidth={1.5} />
                 </button>
               </div>
             </div>
