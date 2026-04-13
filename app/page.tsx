@@ -25,7 +25,7 @@ import type { FeedItem } from "@/lib/rss";
 import { sources as allSources } from "@/lib/sources";
 
 type CategoryFilter = "All" | "Saved" | string;
-type LangFilter = "EN" | "CN";
+type LangFilter = "All" | "EN" | "CN";
 
 const FAVS_KEY = "rss-favorites";
 
@@ -218,7 +218,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
-  const [langFilter, setLangFilter] = useState<LangFilter>("EN");
+  const [langFilter, setLangFilter] = useState<LangFilter>("All");
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [selected, setSelected] = useState<FeedItem | null>(null);
@@ -278,6 +278,7 @@ export default function Home() {
     const isCN = cnDomains.has(item.sourceDomain);
     if (langFilter === "EN" && isCN) return false;
     if (langFilter === "CN" && !isCN) return false;
+    // "All" — no language filtering
     if (categoryFilter !== "All" && item.category !== categoryFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -408,7 +409,7 @@ export default function Home() {
           <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
             {/* EN / CN toggle */}
             <div className="flex gap-1">
-              {(["EN", "CN"] as LangFilter[]).map((lang) => (
+              {(["All", "EN", "CN"] as LangFilter[]).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLangFilter(lang)}
