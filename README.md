@@ -40,19 +40,6 @@ Edit `lib/sources.ts`:
 }
 ```
 
-## Current Sources
-
-| Source | Category | Language |
-|--------|----------|----------|
-| LessWrong Frontpage | Ideas | EN |
-| LessWrong Curated | Ideas | EN |
-| Hacker News | Tech | EN |
-| Paul Graham Essays | Ideas | EN |
-| The Verge | Tech | EN |
-| MIT Technology Review | Science | EN |
-| Juejin | Tech | CN |
-| Escalation Trap | Politics | EN |
-
 ## Deployment
 
 Deploy to Vercel with zero config:
