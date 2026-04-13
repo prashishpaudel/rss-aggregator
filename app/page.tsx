@@ -25,6 +25,7 @@ import type { FeedItem } from "@/lib/rss";
 import { sources as allSources } from "@/lib/sources";
 
 type CategoryFilter = "All" | "Saved" | string;
+type LangFilter = "EN" | "CN";
 
 const FAVS_KEY = "rss-favorites";
 
@@ -217,7 +218,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
-
+  const [langFilter, setLangFilter] = useState<LangFilter>("EN");
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [selected, setSelected] = useState<FeedItem | null>(null);
@@ -269,8 +270,14 @@ export default function Home() {
   const categories = ["All", ...Array.from(new Set(items.map((i) => i.category))).sort()];
   const sources = Array.from(new Set(items.map((i) => i.source))).sort();
 
+  // CN sources — detected by domain (juejin.cn)
+  const cnDomains = new Set(["juejin.cn"]);
+
   const filtered = items.filter((item) => {
     if (categoryFilter === "Saved") return favs.has(favKey(item));
+    const isCN = cnDomains.has(item.sourceDomain);
+    if (langFilter === "EN" && isCN) return false;
+    if (langFilter === "CN" && !isCN) return false;
     if (categoryFilter !== "All" && item.category !== categoryFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -399,6 +406,23 @@ export default function Home() {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Toolbar */}
           <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
+            {/* EN / CN toggle */}
+            <div className="flex gap-1">
+              {(["EN", "CN"] as LangFilter[]).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLangFilter(lang)}
+                  className={`text-[11px] tracking-widest uppercase px-2.5 py-1 rounded transition-colors duration-100 ${
+                    langFilter === lang
+                      ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
+                      : "text-[#bbb] dark:text-[#444] hover:text-[#666] dark:hover:text-[#888]"
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
             <div className="ml-auto flex items-center gap-2 text-[#aaa] dark:text-[#444] border-b border-[#ddd] dark:border-[#2a2a28] pb-0.5">
               <Search size={14} strokeWidth={1.5} />
               <input
@@ -421,6 +445,22 @@ export default function Home() {
               </span>
             )}
           </div>
+
+          {/* Translate banner — shown when CN is active */}
+          {langFilter === "CN" && (
+            <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-5 py-2 bg-[#f0f0ec] dark:bg-[#141413] border-b border-[#e8e8e4] dark:border-[#222220]">
+              <span className="text-xs text-[#888] dark:text-[#555]">Showing Chinese sources</span>
+              <a
+                href={`https://translate.google.com/translate?sl=zh-CN&tl=en&u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs flex items-center gap-1.5 text-[#888] dark:text-[#555] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors border-b border-[#ddd] dark:border-[#333] pb-0.5"
+              >
+                <Globe size={12} strokeWidth={1.5} />
+                Translate page
+              </a>
+            </div>
+          )}
 
           {/* Feed items */}
           <div className="flex-1 overflow-y-auto">
