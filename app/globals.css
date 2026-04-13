@@ -9,8 +9,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-karla);
+  --font-display: var(--font-fraunces);
+  --font-mono: ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,7 +24,16 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-karla), sans-serif;
+}
+
+/* Fraunces for all titles and headings */
+h1, h2, h3, h4 {
+  font-family: var(--font-fraunces), serif;
+}
+
+.font-display {
+  font-family: var(--font-fraunces), serif;
 }
 
 /* Article reader prose styles */
@@ -50,6 +60,7 @@ body {
 .prose-reader h2,
 .prose-reader h3,
 .prose-reader h4 {
+  font-family: var(--font-fraunces), serif;
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.35;
