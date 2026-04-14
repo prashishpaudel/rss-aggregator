@@ -63,4 +63,9 @@ export const sources: RSSSource[] = [
     url: "https://newsletter.pragmaticengineer.com/feed",
     category: "Tech",
   },
+  {
+    name: "Daily Dose of Data Science",
+    url: "https://blog.dailydoseofds.com/feed",
+    category: "Tech",
+  },
 ];
