@@ -406,14 +406,14 @@ export default function Home() {
         {/* ── Feed list ── */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Toolbar */}
-          <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
+          <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-4 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
             {/* EN / CN toggle */}
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {(["All", "EN", "CN"] as LangFilter[]).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLangFilter(lang)}
-                  className={`text-[11px] tracking-widest uppercase px-2.5 py-1 rounded transition-colors duration-100 ${
+                  className={`text-xs tracking-widest uppercase px-3 py-1.5 rounded transition-colors duration-100 ${
                     langFilter === lang
                       ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
                       : "text-[#bbb] dark:text-[#444] hover:text-[#666] dark:hover:text-[#888]"
@@ -425,17 +425,17 @@ export default function Home() {
             </div>
 
             <div className="ml-auto flex items-center gap-2 text-[#aaa] dark:text-[#444] border-b border-[#ddd] dark:border-[#2a2a28] pb-0.5">
-              <Search size={14} strokeWidth={1.5} />
+              <Search size={15} strokeWidth={1.5} />
               <input
                 type="text"
                 placeholder="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="text-sm bg-transparent outline-none text-[#1a1a1a] dark:text-[#e2e2de] placeholder:text-[#ccc] dark:placeholder:text-[#333] w-28 md:w-36"
+                className="text-[0.9rem] bg-transparent outline-none text-[#1a1a1a] dark:text-[#e2e2de] placeholder:text-[#ccc] dark:placeholder:text-[#333] w-28 md:w-36"
               />
               {search && (
                 <button onClick={() => setSearch("")}>
-                  <X size={13} strokeWidth={1.5} />
+                  <X size={14} strokeWidth={1.5} />
                 </button>
               )}
             </div>
@@ -554,19 +554,19 @@ export default function Home() {
             bg-[#fafaf8] dark:bg-[#0d0d0c]
           ">
             {/* Reader header */}
-            <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 border-b border-[#e8e8e4] dark:border-[#222220]">
+            <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
               <button
                 onClick={() => setSelected(null)}
                 className="md:hidden text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors mr-3"
                 aria-label="Back to feed"
               >
-                <ArrowLeft size={22} strokeWidth={1.5} />
+                <ArrowLeft size={24} strokeWidth={1.5} />
               </button>
-              <p className="text-xs text-[#aaa] dark:text-[#444] truncate flex-1 mr-3 flex items-center gap-1.5">
-                <SourceFavicon domain={selected.sourceDomain} size={13} />
+              <p className="text-sm text-[#aaa] dark:text-[#444] truncate flex-1 mr-3 flex items-center gap-2">
+                <SourceFavicon domain={selected.sourceDomain} size={15} />
                 {selected.source} · {formatDate(selected.date)}
               </p>
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-4 flex-shrink-0">
                 {/* Bookmark in reader */}
                 <button
                   onClick={(e) => toggleFav(selected, e)}
@@ -578,7 +578,7 @@ export default function Home() {
                   aria-label={favs.has(favKey(selected)) ? "Remove from saved" : "Save article"}
                 >
                   <Bookmark
-                    size={18}
+                    size={22}
                     strokeWidth={1.5}
                     fill={favs.has(favKey(selected)) ? "currentColor" : "none"}
                   />
@@ -590,14 +590,14 @@ export default function Home() {
                   className="text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
                   title="Open original"
                 >
-                  <ExternalLink size={18} strokeWidth={1.5} />
+                  <ExternalLink size={22} strokeWidth={1.5} />
                 </a>
                 <button
                   onClick={() => setSelected(null)}
                   className="hidden md:block text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
                   aria-label="Close reader"
                 >
-                  <X size={18} strokeWidth={1.5} />
+                  <X size={22} strokeWidth={1.5} />
                 </button>
               </div>
             </div>
