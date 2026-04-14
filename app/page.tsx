@@ -20,6 +20,8 @@ import {
   Menu,
   ArrowLeft,
   Bookmark,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import type { FeedItem } from "@/lib/rss";
 import { sources as allSources } from "@/lib/sources";
@@ -224,6 +226,7 @@ export default function Home() {
   const [selected, setSelected] = useState<FeedItem | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [favs, setFavs] = useState<Set<string>>(new Set());
 
   // Load favorites from localStorage on mount
@@ -266,6 +269,9 @@ export default function Home() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  // Reset expanded when article changes or closes
+  useEffect(() => { setExpanded(false); }, [selected]);
 
   const categories = ["All", ...Array.from(new Set(items.map((i) => i.category))).sort()];
   const sources = Array.from(new Set(items.map((i) => i.source))).sort();
@@ -545,14 +551,13 @@ export default function Home() {
 
         {/* ── Article reader panel ── */}
         {selected && (
-          <div className="
-            fixed inset-0 z-40
-            md:static md:inset-auto md:z-auto
-            md:flex-shrink-0 md:w-[520px]
-            flex flex-col overflow-hidden
-            border-l border-[#e8e8e4] dark:border-[#222220]
-            bg-[#fafaf8] dark:bg-[#0d0d0c]
-          ">
+          <div className={
+            expanded
+              // Desktop expanded: centered overlay
+              ? "fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#fafaf8] dark:bg-[#0d0d0c]"
+              // Mobile: full screen. Desktop: side panel
+              : "fixed inset-0 z-40 md:static md:inset-auto md:z-auto md:flex-shrink-0 md:w-[520px] flex flex-col overflow-hidden border-l border-[#e8e8e4] dark:border-[#222220] bg-[#fafaf8] dark:bg-[#0d0d0c]"
+          }>
             {/* Reader header */}
             <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-4 border-b border-[#e8e8e4] dark:border-[#222220]">
               <button
@@ -567,6 +572,17 @@ export default function Home() {
                 {selected.source} · {formatDate(selected.date)}
               </p>
               <div className="flex items-center gap-4 flex-shrink-0">
+                {/* Expand/collapse — desktop only */}
+                <button
+                  onClick={() => setExpanded((e) => !e)}
+                  className="hidden md:block text-[#aaa] dark:text-[#444] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors"
+                  aria-label={expanded ? "Collapse reader" : "Expand reader"}
+                >
+                  {expanded
+                    ? <Minimize2 size={22} strokeWidth={1.5} />
+                    : <Maximize2 size={22} strokeWidth={1.5} />
+                  }
+                </button>
                 {/* Bookmark in reader */}
                 <button
                   onClick={(e) => toggleFav(selected, e)}
@@ -603,7 +619,12 @@ export default function Home() {
             </div>
 
             {/* Reader content */}
-            <div className="flex-1 overflow-y-auto px-5 md:px-10 py-8 md:py-10">
+            <div className={`flex-1 overflow-y-auto py-8 md:py-10 ${
+              expanded
+                ? "px-5 md:px-0"
+                : "px-5 md:px-10"
+            }`}>
+            <div className={expanded ? "max-w-[680px] mx-auto px-6" : ""}>
               <h1 className="font-display text-2xl md:text-3xl font-normal leading-tight text-[#1a1a1a] dark:text-[#e2e2de] mb-6 md:mb-8">
                 {selected.title}
               </h1>
@@ -629,7 +650,8 @@ export default function Home() {
                   </a>
                 </div>
               )}
-            </div>
+            </div>{/* end centering div */}
+            </div>{/* end scroll div */}
           </div>
         )}
       </div>
