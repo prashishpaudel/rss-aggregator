@@ -58,7 +58,7 @@ function sanitizeHtml(html: string): string {
 async function fetchFeed(source: RSSSource): Promise<FeedItem[]> {
   try {
     const feed = await parser.parseURL(source.url);
-    return (feed.items || []).slice(0, 20).map((item) => {
+    return (feed.items || []).slice(0, 30).map((item) => {
       // Prefer content:encoded (full article) → item.content → nothing
       const rawFull =
         (item as unknown as Record<string, string>).contentEncoded ||
