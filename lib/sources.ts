@@ -68,9 +68,54 @@ export const sources: RSSSource[] = [
     url: "https://blog.dailydoseofds.com/feed",
     category: "Tech",
   },
-    {
+  {
     name: "Dev.to",
     url: "https://dev.to/feed",
     category: "Tech",
+  },
+    {
+    name: "AI News",
+    url: "https://news.smol.ai/rss.xml",
+    category: "Tech",
+  },
+  {
+    name: "Space.com",
+    url: "https://www.space.com/feeds/all",
+    category: "Science",
+  },
+  {
+    name: "MIT News",
+    url: "https://news.mit.edu/rss/feed",
+    category: "Science",
+  },
+  {
+    name: "Nature",
+    url: "https://www.nature.com/nature.rss",
+    category: "Science",
+  },
+  {
+    name: "Quanta Magazine",
+    url: "https://www.quantamagazine.org/feed/",
+    category: "Science",
+  },
+  {
+    name: "Science News",
+    url: "https://www.sciencenews.org/feed",
+    category: "Science",
+  },
+  {
+    name: "The Verge",
+    url: "https://www.theverge.com/rss/index.xml",
+    category: "Tech",
+  },
+  {
+    name: "NPR Science",
+    url: "https://feeds.npr.org/1007/rss.xml",
+    category: "Science",
+  },
+  {
+    name: "Phys.org",
+    url: "https://phys.org/rss-feed/",
+    category: "Science",
   },
 ];
