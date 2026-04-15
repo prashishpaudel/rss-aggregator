@@ -228,6 +228,9 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [favs, setFavs] = useState<Set<string>>(new Set());
+  const [fetchedContent, setFetchedContent] = useState<string | null>(null);
+  const [fetchingArticle, setFetchingArticle] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Load favorites from localStorage on mount
   useEffect(() => { setFavs(loadFavs()); }, []);
@@ -242,6 +245,21 @@ export default function Home() {
       saveFavs(next);
       return next;
     });
+  }, []);
+
+  const fetchArticle = useCallback(async (url: string) => {
+    setFetchingArticle(true);
+    setFetchError(null);
+    try {
+      const res = await fetch(`/api/article?url=${encodeURIComponent(url)}`);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+      setFetchedContent(json.content);
+    } catch (err) {
+      setFetchError(err instanceof Error ? err.message : "Failed to fetch article");
+    } finally {
+      setFetchingArticle(false);
+    }
   }, []);
 
   const fetchFeed = useCallback(async () => {
@@ -270,8 +288,13 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Reset expanded when article changes or closes
-  useEffect(() => { setExpanded(false); }, [selected]);
+  // Reset expanded + fetched content when article changes or closes
+  useEffect(() => {
+    setExpanded(false);
+    setFetchedContent(null);
+    setFetchError(null);
+    setFetchingArticle(false);
+  }, [selected]);
 
   const categories = ["All", ...Array.from(new Set(items.map((i) => i.category))).sort()];
   const sources = Array.from(new Set(items.map((i) => i.source))).sort();
@@ -596,6 +619,27 @@ export default function Home() {
                     : <Maximize2 size={22} strokeWidth={1.5} />
                   }
                 </button>
+                {/* Read in app / toggle */}
+                <button
+                  onClick={() => {
+                    if (fetchedContent) {
+                      setFetchedContent(null);
+                      setFetchError(null);
+                    } else {
+                      fetchArticle(selected.link);
+                    }
+                  }}
+                  disabled={fetchingArticle}
+                  className={`transition-colors duration-100 disabled:opacity-30 ${
+                    fetchedContent
+                      ? "text-[#555] dark:text-[#aaa]"
+                      : "text-[#ccc] dark:text-[#333] hover:text-[#555] dark:hover:text-[#aaa]"
+                  }`}
+                  aria-label={fetchedContent ? "Back to feed content" : "Read in app"}
+                  title={fetchedContent ? "Back to feed content" : "Read in app"}
+                >
+                  <BookOpen size={22} strokeWidth={1.5} className={fetchingArticle ? "animate-pulse" : ""} />
+                </button>
                 {/* Bookmark in reader */}
                 <button
                   onClick={(e) => toggleFav(selected, e)}
@@ -642,23 +686,46 @@ export default function Home() {
                 {selected.title}
               </h1>
 
-              {selected.fullContent ? (
+              {/* Priority: fetched > fullContent > fallback */}
+              {fetchedContent ? (
+                <div
+                  className="prose-reader"
+                  dangerouslySetInnerHTML={{ __html: fetchedContent }}
+                />
+              ) : selected.fullContent ? (
                 <div
                   className="prose-reader"
                   dangerouslySetInnerHTML={{ __html: selected.fullContent }}
                 />
               ) : (
                 <div>
-                  <p className="text-sm text-[#666] dark:text-[#777] leading-relaxed">
-                    {selected.summary}
-                  </p>
+                  {selected.summary && (
+                    <p className="text-sm text-[#666] dark:text-[#777] leading-relaxed mb-6">
+                      {selected.summary}
+                    </p>
+                  )}
+
+                  {fetchingArticle && (
+                    <p className="text-sm text-[#bbb] dark:text-[#444]">Fetching article…</p>
+                  )}
+
+                  {fetchError && (
+                    <p className="text-sm text-red-400">{fetchError}</p>
+                  )}
+
+                  {!fetchingArticle && !fetchError && (
+                    <p className="text-sm text-[#bbb] dark:text-[#444]">
+                      Use the <BookOpen size={13} strokeWidth={1.5} className="inline-block mx-0.5 align-text-bottom" /> icon above to read in app.
+                    </p>
+                  )}
+
                   <a
                     href={selected.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 mt-6 text-sm text-[#aaa] dark:text-[#555] hover:text-[#1a1a1a] dark:hover:text-[#e2e2de] transition-colors border-b border-[#ddd] dark:border-[#333] pb-0.5"
                   >
-                    Read full article
+                    Open original
                     <ExternalLink size={12} strokeWidth={1.5} />
                   </a>
                 </div>
