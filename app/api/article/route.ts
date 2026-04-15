@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { JSDOM } from "jsdom";
+import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
 
 export async function GET(request: Request) {
@@ -39,8 +39,8 @@ export async function GET(request: Request) {
     }
 
     const html = await res.text();
-    const dom = new JSDOM(html, { url });
-    const reader = new Readability(dom.window.document);
+    const { document } = parseHTML(html);
+    const reader = new Readability(document as unknown as Document);
     const article = reader.parse();
 
     if (!article) {
