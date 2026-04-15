@@ -132,7 +132,7 @@ function SidebarContent({
             Library
           </p>
           <button
-            onClick={() => { setCategoryFilter("Saved"); onSelect(); }}
+            onClick={() => { setCategoryFilter("Saved"); setSearch(""); onSelect(); }}
             className={`w-full flex items-center justify-between px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
               categoryFilter === "Saved"
                 ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
@@ -158,7 +158,7 @@ function SidebarContent({
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => { setCategoryFilter(cat); onSelect(); }}
+                onClick={() => { setCategoryFilter(cat); setSearch(""); onSelect(); }}
                 className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
                   categoryFilter === cat
                     ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
