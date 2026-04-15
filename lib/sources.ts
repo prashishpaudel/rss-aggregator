@@ -68,4 +68,9 @@ export const sources: RSSSource[] = [
     url: "https://blog.dailydoseofds.com/feed",
     category: "Tech",
   },
+    {
+    name: "Dev.to",
+    url: "https://dev.to/feed",
+    category: "Tech",
+  },
 ];
