@@ -510,14 +510,27 @@ export default function Home() {
                           </>
                         )}
                       </p>
-                      <p className="font-display text-[1.05rem] font-normal leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
-                        {item.title}
-                      </p>
-                      {item.summary && (
-                        <p className="mt-1.5 text-[0.82rem] text-[#999] dark:text-[#4a4a48] leading-relaxed line-clamp-2">
-                          {item.summary}
-                        </p>
-                      )}
+                      <div className={`flex items-start gap-3 ${item.image ? "justify-between" : ""}`}>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-display text-[1.05rem] font-normal leading-snug text-[#1a1a1a] dark:text-[#e2e2de] group-hover:text-[#444] dark:group-hover:text-[#aaa] transition-colors">
+                            {item.title}
+                          </p>
+                          {item.summary && (
+                            <p className="mt-1.5 text-[0.82rem] text-[#999] dark:text-[#4a4a48] leading-relaxed line-clamp-2">
+                              {item.summary}
+                            </p>
+                          )}
+                        </div>
+                        {item.image && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.image}
+                            alt=""
+                            className="flex-shrink-0 w-20 h-14 object-cover rounded-md bg-[#e8e8e4] dark:bg-[#222220]"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                          />
+                        )}
+                      </div>
                     </button>
 
                     {/* Bookmark button */}

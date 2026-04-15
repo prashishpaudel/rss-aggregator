@@ -11,6 +11,8 @@ export interface FeedItem {
   summary: string;
   // Full HTML content from feed (not all feeds provide this)
   fullContent: string | null;
+  // Hero image extracted from feed item
+  image: string | null;
 }
 
 const parser = new Parser({
@@ -21,9 +23,37 @@ const parser = new Parser({
   },
   // Request content:encoded field (full article HTML many feeds include)
   customFields: {
-    item: [["content:encoded", "contentEncoded"]],
+    item: [
+      ["content:encoded", "contentEncoded"],
+      ["media:content", "mediaContent"],
+      ["media:thumbnail", "mediaThumbnail"],
+    ],
   },
 });
+
+// Extract first image URL from various RSS item fields
+function extractImage(item: Record<string, unknown>): string | null {
+  // enclosure (e.g. podcasts, some news feeds)
+  const enc = item.enclosure as { url?: string; type?: string } | undefined;
+  if (enc?.url && enc.type?.startsWith("image/")) return enc.url;
+
+  // media:content url attr
+  const mc = item.mediaContent as { $?: { url?: string }; url?: string } | undefined;
+  const mcUrl = mc?.$?.url ?? mc?.url;
+  if (mcUrl) return mcUrl;
+
+  // media:thumbnail url attr
+  const mt = item.mediaThumbnail as { $?: { url?: string }; url?: string } | undefined;
+  const mtUrl = mt?.$?.url ?? mt?.url;
+  if (mtUrl) return mtUrl;
+
+  // First <img src="..."> in content:encoded or content
+  const html = (item.contentEncoded as string) || (item.content as string) || "";
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (match?.[1]) return match[1];
+
+  return null;
+}
 
 // Strip HTML tags to plain text
 function stripHtml(html: string): string {
@@ -59,11 +89,9 @@ async function fetchFeed(source: RSSSource): Promise<FeedItem[]> {
   try {
     const feed = await parser.parseURL(source.url);
     return (feed.items || []).slice(0, 30).map((item) => {
+      const raw = item as unknown as Record<string, unknown>;
       // Prefer content:encoded (full article) → item.content → nothing
-      const rawFull =
-        (item as unknown as Record<string, string>).contentEncoded ||
-        item.content ||
-        null;
+      const rawFull = (raw.contentEncoded as string) || item.content || null;
 
       return {
         title: item.title?.trim() || "Untitled",
@@ -76,6 +104,7 @@ async function fetchFeed(source: RSSSource): Promise<FeedItem[]> {
           item.contentSnippet || item.content || item.summary || ""
         ).slice(0, 300),
         fullContent: rawFull ? sanitizeHtml(rawFull) : null,
+        image: extractImage(raw),
       };
     });
   } catch (err) {
