@@ -131,7 +131,7 @@ function MediaPanel() {
                   }`}>
                     <button
                       onClick={() => toggleVideo(i)}
-                      className="absolute -top-5 -right-5 text-[#bbb] dark:text-[#444] hover:text-[#555] dark:hover:text-[#aaa] transition-colors"
+                      className="absolute -top-5 -right-5 hidden md:block text-[#bbb] dark:text-[#444] hover:text-[#555] dark:hover:text-[#aaa] transition-colors"
                       aria-label={expanded ? "Shrink video" : "Expand video"}
                     >
                       {expanded
