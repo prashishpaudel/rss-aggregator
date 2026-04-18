@@ -124,14 +124,14 @@ function MediaPanel() {
             {videos.map((item, i) => {
               const expanded = expandedVideos.has(i);
               return (
-                <div key={i} className="px-4 md:px-6 py-4">
+                <div key={i} className="px-4 md:px-6 pt-8 pb-4">
                   {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
                   <div className={`relative aspect-video rounded-lg overflow-visible ${
                     expanded ? "w-full" : "w-[32rem]"
                   }`}>
                     <button
                       onClick={() => toggleVideo(i)}
-                      className="absolute -top-6 right-0 text-[#bbb] dark:text-[#444] hover:text-[#555] dark:hover:text-[#aaa] transition-colors"
+                      className="absolute -top-5 -right-5 text-[#bbb] dark:text-[#444] hover:text-[#555] dark:hover:text-[#aaa] transition-colors"
                       aria-label={expanded ? "Shrink video" : "Expand video"}
                     >
                       {expanded
