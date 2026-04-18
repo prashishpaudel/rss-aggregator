@@ -127,7 +127,7 @@ function MediaPanel() {
                 <div key={i} className="px-4 md:px-6 pt-8 pb-4">
                   {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
                   <div className={`relative aspect-video rounded-lg overflow-visible ${
-                    expanded ? "w-full" : "w-[32rem]"
+                    expanded ? "w-full" : "w-full md:w-[32rem]"
                   }`}>
                     <button
                       onClick={() => toggleVideo(i)}
