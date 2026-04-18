@@ -100,42 +100,69 @@ function SourceFavicon({ domain, size = 16 }: { domain: string; size?: number })
 }
 
 function MediaPanel() {
+  const [expandedVideos, setExpandedVideos] = useState<Set<number>>(new Set());
   const videos = mediaItems.filter((m) => m.type === "youtube");
   const podcasts = mediaItems.filter((m) => m.type === "spotify" || m.type === "apple-podcast");
 
+  function toggleVideo(i: number) {
+    setExpandedVideos((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  }
+
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8">
+    <div className="flex-1 overflow-y-auto">
       {videos.length > 0 && (
-        <section>
-          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-3 px-1">
+        <section className="border-b border-[#e8e8e4] dark:border-[#222220]">
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] px-4 md:px-6 pt-5 pb-3">
             YouTube
           </p>
-          <div className="space-y-5">
-            {videos.map((item, i) => (
-              <div key={i}>
-                {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#e8e8e4] dark:bg-[#1c1c1b]">
-                  <iframe
-                    src={youtubeEmbedUrl(item.url)}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+          <div className="divide-y divide-[#ebebea] dark:divide-[#1c1c1b]">
+            {videos.map((item, i) => {
+              const expanded = expandedVideos.has(i);
+              return (
+                <div key={i} className="px-4 md:px-6 py-4">
+                  {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
+                  <div className={`relative aspect-video rounded-lg overflow-visible ${
+                    expanded ? "w-full" : "w-[32rem]"
+                  }`}>
+                    <button
+                      onClick={() => toggleVideo(i)}
+                      className="absolute -top-6 right-0 text-[#bbb] dark:text-[#444] hover:text-[#555] dark:hover:text-[#aaa] transition-colors"
+                      aria-label={expanded ? "Shrink video" : "Expand video"}
+                    >
+                      {expanded
+                        ? <Minimize2 size={20} strokeWidth={1.5} />
+                        : <Maximize2 size={20} strokeWidth={1.5} />
+                      }
+                    </button>
+                    <div className="w-full h-full rounded-lg overflow-hidden bg-[#e8e8e4] dark:bg-[#1c1c1b]">
+                      <iframe
+                        src={youtubeEmbedUrl(item.url)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
 
       {podcasts.length > 0 && (
         <section>
-          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-3 px-1">
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] px-4 md:px-6 pt-5 pb-3">
             Podcasts
           </p>
-          <div className="space-y-4">
+          <div className="divide-y divide-[#ebebea] dark:divide-[#1c1c1b]">
             {podcasts.map((item, i) => (
-              <div key={i}>
+              <div key={i} className="px-4 md:px-6 py-4">
                 {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
                 {item.type === "apple-podcast" ? (
                   <iframe
