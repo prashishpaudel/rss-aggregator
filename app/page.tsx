@@ -22,9 +22,11 @@ import {
   Bookmark,
   Maximize2,
   Minimize2,
+  Tv,
 } from "lucide-react";
 import type { FeedItem } from "@/lib/rss";
 import { sources as allSources } from "@/lib/sources";
+import { mediaItems, youtubeEmbedUrl, spotifyEmbedUrl, applePodcastEmbedUrl } from "@/lib/media";
 
 type CategoryFilter = "All" | "Saved" | string;
 type LangFilter = "All" | "EN" | "CN";
@@ -97,6 +99,75 @@ function SourceFavicon({ domain, size = 16 }: { domain: string; size?: number })
   );
 }
 
+function MediaPanel() {
+  const videos = mediaItems.filter((m) => m.type === "youtube");
+  const podcasts = mediaItems.filter((m) => m.type === "spotify" || m.type === "apple-podcast");
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8">
+      {videos.length > 0 && (
+        <section>
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-3 px-1">
+            YouTube
+          </p>
+          <div className="space-y-5">
+            {videos.map((item, i) => (
+              <div key={i}>
+                {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#e8e8e4] dark:bg-[#1c1c1b]">
+                  <iframe
+                    src={youtubeEmbedUrl(item.url)}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {podcasts.length > 0 && (
+        <section>
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-3 px-1">
+            Podcasts
+          </p>
+          <div className="space-y-4">
+            {podcasts.map((item, i) => (
+              <div key={i}>
+                {item.title && <p className="text-[0.88rem] text-[#666] dark:text-[#777] mb-2">{item.title}</p>}
+                {item.type === "apple-podcast" ? (
+                  <iframe
+                    src={applePodcastEmbedUrl(item.url)}
+                    className="w-full rounded-lg"
+                    height="175"
+                    sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+                    allow="autoplay *; encrypted-media *; clipboard-write"
+                  />
+                ) : (
+                  <iframe
+                    src={spotifyEmbedUrl(item.url)}
+                    className="w-full rounded-lg"
+                    height="152"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {mediaItems.length === 0 && (
+        <p className="text-sm text-[#bbb] dark:text-[#444] text-center mt-20">
+          No media yet. Add items to <code className="text-[#999] dark:text-[#555]">lib/media.ts</code>.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function SidebarContent({
   categories,
   sources,
@@ -108,6 +179,7 @@ function SidebarContent({
   loading,
   fetchFeed,
   favCount,
+  mediaMode,
   onSelect,
 }: {
   categories: string[];
@@ -120,7 +192,8 @@ function SidebarContent({
   loading: boolean;
   fetchFeed: () => void;
   favCount: number;
-  onSelect: () => void;
+  mediaMode: boolean;
+  onSelect: (val?: string) => void;
 }) {
   return (
     <>
@@ -132,7 +205,7 @@ function SidebarContent({
             Library
           </p>
           <button
-            onClick={() => { setCategoryFilter("Saved"); setSearch(""); onSelect(); }}
+            onClick={() => { setCategoryFilter("Saved"); setSearch(""); onSelect(); } }
             className={`w-full flex items-center justify-between px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
               categoryFilter === "Saved"
                 ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
@@ -170,6 +243,24 @@ function SidebarContent({
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Media */}
+        <div>
+          <p className="text-[10px] font-medium tracking-widest uppercase text-[#bbb] dark:text-[#444] mb-2 px-1">
+            Media
+          </p>
+          <button
+            onClick={() => { onSelect("__media__"); }}
+            className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
+              mediaMode
+                ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
+                : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
+            }`}
+          >
+            <Tv size={17} strokeWidth={1.5} />
+            <span>Media</span>
+          </button>
         </div>
 
         {/* Sources */}
@@ -231,6 +322,7 @@ export default function Home() {
   const [fetchedContent, setFetchedContent] = useState<string | null>(null);
   const [fetchingArticle, setFetchingArticle] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [mediaMode, setMediaMode] = useState(false);
 
   // Load favorites from localStorage on mount
   useEffect(() => { setFavs(loadFavs()); }, []);
@@ -320,6 +412,15 @@ export default function Home() {
     return true;
   });
 
+  function handleSidebarSelect(val?: string) {
+    if (val === "__media__") {
+      setMediaMode(true);
+      setSelected(null);
+    } else {
+      setMediaMode(false);
+    }
+  }
+
   const sidebarProps = {
     categories,
     sources,
@@ -331,6 +432,7 @@ export default function Home() {
     loading,
     fetchFeed,
     favCount: favs.size,
+    mediaMode,
   };
 
   return (
@@ -379,7 +481,7 @@ export default function Home() {
                   <X size={16} strokeWidth={1.5} />
                 </button>
               </div>
-              <SidebarContent {...sidebarProps} onSelect={() => setDrawerOpen(false)} />
+              <SidebarContent {...sidebarProps} onSelect={(val) => { handleSidebarSelect(val); setDrawerOpen(false); }} />
             </aside>
           </div>
         )}
@@ -409,7 +511,7 @@ export default function Home() {
             </button>
           </div>
 
-          {sidebarOpen && <SidebarContent {...sidebarProps} onSelect={() => {}} />}
+          {sidebarOpen && <SidebarContent {...sidebarProps} onSelect={handleSidebarSelect} />}
 
           {!sidebarOpen && (
             <div className="mt-auto border-t border-[#e8e8e4] dark:border-[#222220] p-3 flex flex-col items-center gap-3">
@@ -432,8 +534,8 @@ export default function Home() {
           )}
         </aside>
 
-        {/* ── Feed list ── */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* ── Feed list / Media panel ── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">{mediaMode ? <MediaPanel /> : (<>
           {/* Toolbar */}
           <div className="flex-shrink-0 flex items-center gap-3 px-4 md:px-5 py-4 border-b border-[#e8e8e4] dark:border-[#222220] bg-[#f7f7f5] dark:bg-[#0f0f0e]">
             {/* EN / CN toggle */}
@@ -583,7 +685,7 @@ export default function Home() {
               </p>
             )}
           </div>
-        </div>
+        </>)}</div>
 
         {/* ── Article reader panel ── */}
         {selected && (
