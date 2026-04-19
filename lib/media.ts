@@ -5,6 +5,7 @@ export type MediaItem = {
 };
 
 export const mediaItems: MediaItem[] = [
+  { type: "youtube", url: "https://www.youtube.com/watch?v=mYDGPyYqvUU" },
   { type: "youtube", url: "https://www.youtube.com/watch?v=wm-hqM9F8BM" },
   { type: "youtube", url: "https://www.youtube.com/watch?v=hp6n1qwo1Ws" },
   {
@@ -12,11 +13,10 @@ export const mediaItems: MediaItem[] = [
     url: "https://podcasts.apple.com/us/podcast/the-wisdom-of-the-right-timing-taoism/id1831764919?i=1000743679174",
     title: "The Wisdom of the Right Timing — Taoism",
   },
-    {
+  {
     type: "apple-podcast",
     url: "https://podcasts.apple.com/us/podcast/4-the-illusion-of-the-ego/id1071578260?i=1000361317746",
-    title: "The illusion of the ego"
-,
+    title: "The illusion of the ego",
   },
 ];
 
