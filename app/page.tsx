@@ -207,12 +207,14 @@ function SidebarContent({
   fetchFeed,
   favCount,
   mediaMode,
+  search,
   onSelect,
 }: {
   categories: string[];
   sources: string[];
   categoryFilter: CategoryFilter;
   setCategoryFilter: (c: string) => void;
+  search: string;
   setSearch: (s: string) => void;
   darkMode: boolean;
   setDarkMode: (fn: (d: boolean) => boolean) => void;
@@ -300,7 +302,11 @@ function SidebarContent({
               <button
                 key={src}
                 onClick={() => { setCategoryFilter("All"); setSearch(src); onSelect(); }}
-                className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa] transition-colors duration-100"
+                className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-[0.92rem] text-left transition-colors duration-100 ${
+                  search === src && categoryFilter === "All"
+                    ? "bg-[#e4e4e0] dark:bg-[#222220] text-[#1a1a1a] dark:text-[#e2e2de]"
+                    : "text-[#888] dark:text-[#555] hover:bg-[#eaeae6] dark:hover:bg-[#1c1c1b] hover:text-[#444] dark:hover:text-[#aaa]"
+                }`}
               >
                 <SourceFavicon domain={sourceDomainMap[src] ?? src} size={17} />
                 <span className="truncate">{src}</span>
@@ -445,6 +451,7 @@ export default function Home() {
       setSelected(null);
     } else {
       setMediaMode(false);
+      setSelected(null);
     }
   }
 
@@ -453,6 +460,7 @@ export default function Home() {
     sources,
     categoryFilter,
     setCategoryFilter,
+    search,
     setSearch,
     darkMode,
     setDarkMode,
