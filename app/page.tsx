@@ -346,7 +346,10 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
   const [langFilter, setLangFilter] = useState<LangFilter>("All");
   const [search, setSearch] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("rss-darkmode") === "true";
+  });
   const [selected, setSelected] = useState<FeedItem | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -359,6 +362,8 @@ export default function Home() {
 
   // Load favorites from localStorage on mount
   useEffect(() => { setFavs(loadFavs()); }, []);
+
+  useEffect(() => { localStorage.setItem("rss-darkmode", String(darkMode)); }, [darkMode]);
 
   const toggleFav = useCallback((item: FeedItem, e?: React.MouseEvent) => {
     e?.stopPropagation();
