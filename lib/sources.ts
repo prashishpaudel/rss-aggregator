@@ -69,8 +69,8 @@ export const sources: RSSSource[] = [
     category: "Tech",
   },
   {
-    name: "Dev.to",
-    url: "https://dev.to/feed",
+    name: "Lil's blog",
+    url: "https://lilianweng.github.io/index.xml",
     category: "Tech",
   },
     {
